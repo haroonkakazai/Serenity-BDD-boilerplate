@@ -6,4 +6,7 @@ import net.thucydides.core.pages.PageObject;
 @DefaultUrl("https://www.google.com")
 public class ExampleHomePage extends PageObject {
     //rest of code
+    public static void main(String[] args) {
+        System.out.println("Hello world");
+    }
 }
