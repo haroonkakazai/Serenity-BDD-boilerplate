@@ -21,31 +21,29 @@
             <groupId>net.serenity-bdd</groupId>
             <artifactId>serenity-core</artifactId>
             <version>${serenity.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
             <artifactId>serenity-cucumber</artifactId>
             <version>${serenity.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
             <artifactId>serenity-screenplay</artifactId>
             <version>${serenity.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
             <artifactId>serenity-screenplay-webdriver</artifactId>
             <version>${serenity.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
             <artifactId>serenity-ensure</artifactId>
             <version>${serenity.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
