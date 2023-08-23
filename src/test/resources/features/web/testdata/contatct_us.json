@@ -1,0 +1,14 @@
+{
+  "user fills the contact us form": {
+
+    "Add Contact Us Parameters": {
+      "Contact_Us": [
+        {
+          "Full Name": "User 1",
+          "Email": "abc@gmail.com",
+          "Message": "Random Message"
+        }
+      ]
+    }
+  }
+}
