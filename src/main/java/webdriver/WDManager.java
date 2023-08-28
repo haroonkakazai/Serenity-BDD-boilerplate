@@ -1,25 +1,34 @@
 package webdriver;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.environment.SystemEnvironmentVariables;
 import net.thucydides.core.util.EnvironmentVariables;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
 
+/**
+ * This class is ,written by Muhammad Ibrahim Ahsan,  about the WebDriver Manager, the purpose of this class is simply run the automation script on the available search engine, we don't need to add the webDriver separately
+ */
 enum Browser {
 
     CHROME("chrome"),
@@ -37,33 +46,97 @@ enum Browser {
     }
 }
 
+/**
+ * The Simple Logging Facade for Java (SLF4J) serves as a simple facade or abstraction for various logging frameworks, such as java.util.logging, log4j 1.x, reload4j and logback.
+ */
 @Slf4j
 public class WDManager {
+
     private static Boolean headless;
     private static Browser browser;
+    private static String browserVersion;
+    private static Boolean local;
+    private static String remoteAddress;
+    private static Platform platform;
+
     private static EnvironmentVariables environmentVariables;
 
     private WDManager(){
         // Hide Implicit Public Constructor
     }
 
-    static EnvironmentVariables environmentVariables(){
+    @NotNull
+    static EnvironmentVariables getEnvironmentVariables(){
         log.debug("Getting Environment Variables!");
         if (environmentVariables == null){environmentVariables = SystemEnvironmentVariables.createEnvironmentVariables();}
         return environmentVariables;
     }
 
+    @NotNull
+    static String getRemoteAddress(){
+        log.debug("Getting Remote Address from Environment Variables");
+        if (remoteAddress == null){
+            remoteAddress = getEnvironmentVariables()
+                    .getProperty("webdriver.remote.address","");
+            if (remoteAddress.isEmpty()){
+                log.warn("No remote address Set, setting local to \"true\"");
+                local = true;}
+        }
+        return remoteAddress;
+    }
+
+
+    @NotNull
+    static String getBrowserVersion(){
+        log.debug("Getting Browser Version from Environment Variables");
+        if (browserVersion == null){
+            browserVersion = getEnvironmentVariables().getProperty("webdriver.remote.browser.version","");
+        }
+        return browserVersion;
+    }
+
+    @NotNull
+    static Boolean isLocal(){
+        log.debug("Getting Local from Environment Variables");
+        if (local == null){local = getEnvironmentVariables()
+                .getPropertyAsBoolean("webdriver.local",true);}
+        return local;
+    }
+
+    @NotNull
     static Boolean isHeadless(){
-        log.debug("Getting Headless from Configuration");
-        if (headless == null){headless = environmentVariables()
-                .getProperty("headless.mode").equals("true");}
+        log.debug("Getting Headless from Environment Variables");
+        if (headless == null) {
+            if (isLocal()) {
+                headless = getEnvironmentVariables()
+                        .getPropertyAsBoolean("headless.mode", false);
+            } else {
+                log.warn("Headless set to False for remote");
+                headless = false;
+            }
+        }
         return headless;
     }
 
+    @NotNull
+    static Platform getPlatform(){
+        log.debug("Getting Platform from Environment Variables");
+        if (platform == null){
+            String configurationValue = getEnvironmentVariables().getProperty("webdriver.remote.os","");
+            if (configurationValue.isEmpty()){
+                platform = Platform.ANY;
+            } else {
+                platform = Platform.fromString(configurationValue);
+            }
+        }
+        return platform;
+    }
+
+    @NotNull
     static Browser browser(){
-        log.debug("Getting Browser from Configuration");
+        log.debug("Getting Browser from Environment Variables");
         if (browser == null){
-            String configurationValue = environmentVariables().getProperty("webdriver.driver");
+            String configurationValue = getEnvironmentVariables().getProperty("webdriver.driver");
             for (Browser availableBrowser : Browser.values()){
                 if (availableBrowser.equalValue(configurationValue)){
                     browser = availableBrowser;
@@ -76,25 +149,30 @@ public class WDManager {
         return browser;
     }
 
+    @NotNull
     private static List<String> getSwitches(String switchPath){
         log.debug("Getting Switches for " + switchPath);
-        String rawString = environmentVariables().getProperty(switchPath);
+        String rawString = getEnvironmentVariables().getProperty(switchPath);
         return Arrays.asList(rawString.split(";"));
     }
+
+    @SneakyThrows
+    @NotNull
+    private static <T extends MutableCapabilities> WebDriver  getRemote(T options){
+        if (!getBrowserVersion().isEmpty()){
+            options.setCapability("browserVersion",getBrowserVersion());
+        }
+        options.setCapability("platformName", getPlatform());
+        return new RemoteWebDriver(new URL(getRemoteAddress()),options);
+    }
+
+
+    @NotNull
+    @Contract(" -> new")
     private static WebDriver getChrome() {
         log.info("Getting Driver for Chrome");
         // Set Chrome options
         ChromeOptions chromeOptions = new ChromeOptions();
-
-        // Create a temporary directory for each driver instance
-        Path tempUserDataDir;
-        try {
-            tempUserDataDir = Files.createTempDirectory("chrome-profile");
-            chromeOptions.addArguments("--user-data-dir=" + tempUserDataDir.toString());
-        } catch (IOException e) {
-            log.warn("Failed to create a temporary user data directory.");
-        }
-
 
         // Get Switches defined in Serenity conf
         List<String> switches = getSwitches("chrome.switches");
@@ -105,23 +183,22 @@ public class WDManager {
         chromeOptions.setHeadless(isHeadless());
         // Set up the WebDriver using WebDriverManager
         WebDriverManager.chromedriver().setup();
-        return new ChromeDriver(chromeOptions);
+        if (isLocal()) {
+            return new ChromeDriver(chromeOptions);        }
+        else {
+            return getRemote(chromeOptions);
+        }
+
 
     }
 
+
+    @NotNull
+    @Contract(" -> new")
     private static WebDriver getFirefox() {
         log.info("Getting Driver for Firefox");
         // Set Chrome options
         FirefoxOptions firefoxOptions = new FirefoxOptions();
-
-        // Create a temporary directory for each driver instance
-        Path tempUserDataDir;
-        try {
-            tempUserDataDir = Files.createTempDirectory("firefox-profile");
-            firefoxOptions.addArguments("-profile \"" + tempUserDataDir.toString() + "\"");
-        } catch (IOException e) {
-            log.warn("Failed to create a temporary user data directory.");
-        }
 
         // Get Switches defined in Serenity conf
         List<String> switches = getSwitches("firefox.switches");
@@ -133,9 +210,16 @@ public class WDManager {
 
         // Set up the WebDriver using WebDriverManager
         WebDriverManager.firefoxdriver().setup();
-        return new FirefoxDriver(firefoxOptions);
+        if (isLocal()) {
+            return new FirefoxDriver(firefoxOptions);
+        }
+        else {
+            return getRemote(firefoxOptions);
+        }
     }
 
+    @NotNull
+    @Contract("_ -> new")
     public static WebDriver attachToChrome(String port) throws IOException {
         WebDriverManager driverManager = WebDriverManager.getInstance(ChromeDriver.class);
         driverManager.setup();
@@ -146,6 +230,7 @@ public class WDManager {
         return new ChromeDriver(builder.build(),options);
     }
 
+    @Nullable
     public static WebDriver getDriver() {
         if (browser() == Browser.CHROME){
             return getChrome();
@@ -155,4 +240,5 @@ public class WDManager {
             return null;
         }
     }
+
 }
