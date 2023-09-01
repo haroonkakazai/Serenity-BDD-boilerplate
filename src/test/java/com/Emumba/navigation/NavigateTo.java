@@ -10,7 +10,7 @@ import net.serenitybdd.screenplay.actions.Open;
 @SuppressWarnings("unused")
 public class NavigateTo {
     public static Performable homePage(){
-        return Task.where("{0} opens xyz home page",
+        return Task.where("{0} opens Emumba home page",
                 Open.browserOn().the(EmumbaHomePage.class));
     }
 }

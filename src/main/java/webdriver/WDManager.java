@@ -27,7 +27,9 @@ import java.util.List;
 
 
 /**
- * This class is ,written by Muhammad Ibrahim Ahsan,  about the WebDriver Manager, the purpose of this class is simply run the automation script on the available search engine, we don't need to add the webDriver separately
+ * Author : Muhammad Ibrahim Ahsan
+ *
+ * This class is about the WebDriver Manager, the purpose of this class is simply run the automation script on the available search engine, we don't need to add the webDriver separately
  */
 enum Browser {
 
