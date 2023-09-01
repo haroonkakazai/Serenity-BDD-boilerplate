@@ -132,16 +132,16 @@ We can also configure environment-specific properties and options, so that the t
 
 environments {
 default {
-webdriver.base.url = "https://duckduckgo.com"
+webdriver.base.url = "https://myapp.myorg.com"
 }
 dev {
-webdriver.base.url = "https://duckduckgo.com/dev"
+webdriver.base.url = "https://myapp.myorg.com/dev"
 }
 staging {
-webdriver.base.url = "https://duckduckgo.com/staging"
+webdriver.base.url = "https://myapp.myorg.com/staging"
 }
 prod {
-webdriver.base.url = "https://duckduckgo.com/prod"
+webdriver.base.url = "https://myapp.myorg.com/prod"
 }
 }
 You use the environment system property to determine which environment to run against. For example to run the tests in the staging environment, you could run:
@@ -149,10 +149,4 @@ You use the environment system property to determine which environment to run ag
 $ mvn clean verify -Denvironment=staging
 See this article for more details about this feature.
 
-Want to learn more?
-For more information about Serenity BDD, you can read the Serenity BDD Book, the official online Serenity documentation source. Other sources include:
 
-Learn Serenity BDD Online with online courses from the Serenity Dojo Training Library
-Byte-sized Serenity BDD - tips and tricks about Serenity BDD
-For regular posts on agile test automation best practices, join the Agile Test Automation Secrets groups on LinkedIn and Facebook
-Serenity BDD Blog - regular articles about Serenity BDD
