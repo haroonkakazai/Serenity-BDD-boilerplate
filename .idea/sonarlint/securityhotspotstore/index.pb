@@ -18,7 +18,5 @@ d
 4src/main/java/ui/com/Emumba/pages/home/HomePage.java,2\d\2d1ee6fb41450a2c2f08897a4f1b218b8a8db96b
 b
 2src/main/java/ui/com/Emumba/pages/home/HomeUI.java,7\f\7f437f1d438e361ddf14ebf35d0ebf5ccccc32bb
-q
-Asrc/test/java/com/Emumba/acceptancetests/AcceptanceTestSuite.java,9\6\96396031983fd7908e4dea2ef8d2662c2af22751
 V
 &src/main/java/webdriver/WDManager.java,3\9\3954bd56e2ba5cd6e640fb000e6d1b56b4968638
