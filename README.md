@@ -63,21 +63,6 @@ When user clicks on the Contact us button
 And user fills the contact us form
 Then user should see the success message
 
-Screenplay classes emphasise reusable components and a very readable declarative style, whereas Lean Page Objects and Action Classes (that you can see further down) opt for a more imperative style.
-
-The NavigateTo class is responsible for opening the Emumba home page:
-
-public class NavigateTo {
-public static Performable homePage() {
-return Task.where("{0} opens the Emumba home page",
-Open.browserOn().the(homePage.class));
-}
-}
-It does this using a standard Serenity Page Object. Page Objects are often very minimal, storing just the URL of the page itself:
-
-@DefaultUrl("https://www.emumba.com/")
-public class homePage extends PageObject {}
-
 Executing the tests
 To run the sample project, you can either just run the CucumberTestSuite test runner class, or run either mvn verify or gradle test from the command line.
 
